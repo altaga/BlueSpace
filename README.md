@@ -79,6 +79,24 @@ Cloud Services:
 
 # M5 Core2 AWS Setup:
 
+El M5Core2 por fortuna para mi tiene muchos frameworks para poder programarlos, sin embargo ya que mi mayor conocimiento y code snippets los he realizado en el Arduino IDE, apoveche el soporte de Arduino del dispositivo para desarrollar mas eficientemente la solucion.
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Arudino_Logo.svg/1200px-Arudino_Logo.svg.png">
+
+Instala el soporte de las placas ESP32 y la libreria M5Core2 para empezar a trabajar con el Arduino IDE.
+
+1. Arduino IDE - [Program Link](https://www.arduino.cc/en/software)
+2. Arduino M5Core2 Library - [Library Link](https://github.com/m5stack/M5Core2)
+
+Aunque el Arduino IDE viene ya con varios ejemplos para utilizar la placa, dejo varios codigos optimizados y mejorados para que te acostumbres a programar en esta placa.
+
+
+
+Video:
+[![DEMO](./Images/logo.png)](https://youtu.be/wViDAwuF3z8)
+
+Advertencia: El compilado de el codigo en Arduino puede tardar hasta 5 min, no desesperes si la primera compilacion es tardada.
+
 
 
 # AWS Services:
