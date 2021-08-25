@@ -90,14 +90,12 @@ Instala el soporte de las placas ESP32 y la libreria M5Core2 para empezar a trab
 
 Aunque el Arduino IDE viene ya con varios ejemplos para utilizar la placa, dejo varios codigos optimizados y mejorados para que te acostumbres a programar en esta placa.
 
-
+[Test Sketches](https://github.com/altaga/BlueSpace/tree/main/Arduino%20Test%20Sketch)
 
 Video:
 [![DEMO](./Images/logo.png)](https://youtu.be/wViDAwuF3z8)
 
 Advertencia: El compilado de el codigo en Arduino puede tardar hasta 5 min, no desesperes si la primera compilacion es tardada.
-
-
 
 # AWS Services:
 
