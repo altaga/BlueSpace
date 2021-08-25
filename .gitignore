@@ -75,4 +75,5 @@ typings/
 # FuseBox cache
 .fusebox/
 
-.vscode/
+arduino.json
+c_cpp_properties.json
