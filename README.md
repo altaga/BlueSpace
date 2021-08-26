@@ -130,7 +130,7 @@ El utilizar un formato JSON tiene dos motivos principales:
 
 // Realizar video en la barranca de BT para mostrar mejor el funcionamiento.
 
-Para configurar las credenciales del archivo certs.h favor de ir a la seccion [AWS IoT Thing Creation](#create-a-thing)
+Para configurar las credenciales del archivo [certs.h](https://github.com/altaga/BlueSpace/blob/main/Arduino%20Code/BlueSpace/certs.h) favor de ir a la seccion [AWS IoT Thing Creation](#create-a-thing)
 
 # AWS Services:
 
@@ -194,23 +194,106 @@ Con esto el unico dato que nos faltaria para configurar nuestro device seria el 
 
 <img src="./Images/iot9.png">
 
+Asi deberas ver los datos llegar a tu monitor en AWS.
+
+<img src="./Images/mqtt.gif">
+
 ### AWS DynamoDB:
 
+Ya que podemos mandar datos a AWS, no podemos dejar que se desperdicien, los datos debemos analizarlos para poder hacer un exposure tracing posteriormente en nuestra app, asi que como primer paso iremos ahora al servicio de DynamoDB y crearemos una DB con las siguientes caracteristicas.
 
+<img src="./Images/db1.png">
+
+Nada mas tenemos que recordar el nombre de la DB para el siguiente paso.
+
+<img src="./Images/db2.png">
 
 ### AWS IoT Rule:
 
+La forma mas sencilla de poder almacenar los datos recibimos en la cloud de forma automatica, ser a travez de una IoT Rule, esta rule es una proceso que se ejecutara cada vez que recibamos un mensaje en nuestro Topic, como una funcion serverless. Para crear la rule deberemos ir la seccion de rules de AWS IoT.
+
+<img src="./Images/rule1.png">
+
+Crearemos nuestra rule solo colocando el name que queramos y poniendo en la seccion de Rule query statement lo siguiente.
+
+<img src="./Images/rule2.png">
+
+La rule requiere que configuremos una accion que ocurrira cada entrada de datos, para este caso sera la siguiente.
+
+<img src="./Images/rule3.png">
+
+Dentro de esta action la configuracion requerida sera la siguiente.
+
+<img src="./Images/rule4.png">
+
+Una vez terminemos esta configuracion, tendremos la accion de subir datos a la DB de forma automatica.
+
+<img src="./Images/rule5.png">
+
 ## WebPage Services:
+
+Ya que tenemos todos los servicios del device corriendo y mandando datos a nuestra DB, ahora debemos consumirlos en nuestra App para mostrar datos relevantes.
 
 ### AWS Lambda:
 
+Como dice el [Connection Diagram](#connection-diagram) el primer paso para consumir la DB sera crear una lambda que realice una lectura de los datos, ademas ya que nuestra app debe de poder realizar lecturas por fecha, deberemos programar correctamente un scan de la DB.
+
+En mi caso mi solucion fue utilizar python como Backend de la funcion lambda.
+
+    import json
+    import boto3
+    from boto3.dynamodb.conditions import Key
+
+    dynamodb = boto3.resource('dynamodb')
+
+    def lambda_handler(event, context):
+        
+        table = dynamodb.Table("BlueSpace")
+        try:
+            response = table.scan(FilterExpression = Key('Time').gte(event["headers"]["first"]) & Key('Time').lte(event["headers"]["last"]))
+            return(response['Items'])
+        except:
+            return("Error")
+
+Notaremos que el codigo contiene la refrencia de event["headers]["ANY_LABEL"], esto hara que API Gateway pueda mandar las variables en los headers.
+
 ### AWS API Gateway:
+
+Para poder consumir desde nuestra pagina web la funcion lambda, deberemos crear una API que podamos llamar desde la app.
+
+<img src="./Images/api1.png">
+
+Ponemos el nombre que querramos a nuestra API y le damos next hasta que se cree.
+
+<img src="./Images/api2.png">
+
+Una vez teniendo nuestra API, tendremos que crear una route, la cual va a ser el "path" al cual haras la llamada.
+
+<img src="./Images/api3.png">
+
+La integracion de Lambda en la API sera la siguiente.
+
+<img src="./Images/api4.png">
+
+NOTA: Al momento de agregar la integracion de Lambda a nuestra API Gateway, se configurara automaticamente los permisos.
 
 #### Postman Test:
 
+Para probar que esta funcionando nuestra API, usaremos algun software para hacer request como lo es en este caso Postman, como podemos ver si ponemos dos fechas en la API nos regresara nuestro escaneo como muestra la imagen.
+
+<img src="./Images/api5.png">
+
 #### CORS:
 
+Ahora si queremos consumir en nuestra pagina web la API deberemos configurar el Cross-Origin Resource Sharing como se muestra en a imagen.
+
+<img src="./Images/api6.png">
+
+NOTA: sin esto no podremos consumir la API desde la pagina web.
+
 ### AWS S3:
+
+
 
 ### AWS CloudFront:
 
