@@ -9,18 +9,25 @@
 - [Introduction:](#introduction)
 - [Solution:](#solution)
 - [Materials:](#materials)
+  - [Hardware:](#hardware)
+  - [Software:](#software)
+  - [Cloud Services:](#cloud-services)
 - [Connection Diagram:](#connection-diagram)
 - [M5 Core2 AWS Setup:](#m5-core2-aws-setup)
+  - [Main Code:](#main-code)
 - [AWS Services:](#aws-services)
-  - [AWS IoT:](#aws-iot)
-  - [AWS DynamoDB:](#aws-dynamodb)
-  - [AWS IoT Rule:](#aws-iot-rule)
-  - [AWS Lambda:](#aws-lambda)
-  - [AWS API Gateway:](#aws-api-gateway)
-    - [Postman Test:](#postman-test)
-    - [CORS:](#cors)
-  - [AWS S3:](#aws-s3)
-  - [AWS CloudFront:](#aws-cloudfront)
+  - [Device Services:](#device-services)
+    - [AWS IoT:](#aws-iot)
+      - [Create a Thing:](#create-a-thing)
+    - [AWS DynamoDB:](#aws-dynamodb)
+    - [AWS IoT Rule:](#aws-iot-rule)
+  - [WebPage Services:](#webpage-services)
+    - [AWS Lambda:](#aws-lambda)
+    - [AWS API Gateway:](#aws-api-gateway)
+      - [Postman Test:](#postman-test)
+      - [CORS:](#cors)
+    - [AWS S3:](#aws-s3)
+    - [AWS CloudFront:](#aws-cloudfront)
 - [Final Product:](#final-product)
 - [Field Test:](#field-test)
 - [EPIC DEMO:](#epic-demo)
@@ -55,16 +62,16 @@ Our solution has the advantage of not needing to carry out complex video analyti
 
 # Materials:
 
-Hardware:
+## Hardware:
 
 1. M5Stack Core2 ESP32 IoT Development Kit for AWS IoT EduKit - [Product Link](https://shop.m5stack.com/collections/stack-series/products/m5stack-core2-esp32-iot-development-kit-for-aws-iot-edukit)
 
-Software:
+## Software:
 
 1. Arduino IDE - [Program Link](https://www.arduino.cc/en/software)
 2. Arduino M5Core2 Library - [Library Link](https://github.com/m5stack/M5Core2)
 
-Cloud Services:
+## Cloud Services:
 
 1. IoT Core - [Service Link](https://aws.amazon.com/iot-core/)
 2. DynamoDb - [Service Link](https://aws.amazon.com/dynamodb/?nc2=type_a)
@@ -97,25 +104,115 @@ Video:
 
 Advertencia: El compilado de el codigo en Arduino puede tardar hasta 5 min, no desesperes si la primera compilacion es tardada.
 
+## Main Code:
+
+El codigo principal de BlueSpace realiza lo siguiente:
+
+<img src="./Images/softDiagram.png">
+
+El utilizar un formato JSON tiene dos motivos principales:
+
+1. Al realizar el escaneo de dispositivos de BT, es normal obtener dos o mas detecciones del mismo dispositivo, al guardarlo en JSON nos permite usar la Address como una Key, la cual eliminara las refrencias multiples.
+
+        class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
+            void onResult(BLEAdvertisedDevice advertisedDevice) {
+              doc[getAddress(advertisedDevice.toString().c_str())][0] = advertisedDevice.getRSSI();
+              // Device Address as a JSON Key
+              doc[getAddress(advertisedDevice.toString().c_str())][1] = dist(advertisedDevice.getRSSI());
+              // Saving the distance
+              if (minDist >= dist(advertisedDevice.getRSSI())) {
+                minDist = dist(advertisedDevice.getRSSI());
+              }
+            }
+        };
+
+2. En el Backend y en Frontend de la aplicacion el formato json permite una manipulacion y organizacion de datos mas sencilla.
+
+// Realizar video en la barranca de BT para mostrar mejor el funcionamiento.
+
+Para configurar las credenciales del archivo certs.h favor de ir a la seccion [AWS IoT Thing Creation](#create-a-thing)
+
 # AWS Services:
 
-## AWS IoT:
+Todos los servicios de Cloud usados fueron exclusivamente de AWS para el desarrollo de la app, no necesitas experiencia previa para este tutorial, sin embargo recomendamos leer toda la documentacion de los servicios que vamos a utilizar para evitar que te confundas con algun termino.
 
-## AWS DynamoDB:
+[AWS All Link](#cloud-services)
 
-## AWS IoT Rule:
+Los servicios utilizados los dividi en dos grandes ramas, los servicios que utiliza el device principalmente y los servicios que utiliza la WebApp para consumir AWS.
 
-## AWS Lambda:
+## Device Services:
 
-## AWS API Gateway:
+### AWS IoT:
 
-### Postman Test:
+Este servicio es principalmente destinado a poder comunicar a nuestro device de forma segura con AWS, esto se realiza mediante MQTTS, osea un servicio de suscripbion y publicacion de datos a traves de topicos.
 
-### CORS:
+<img src="https://www.luisllamas.es/wp-content/uploads/2019/02/protocolos-iot-pubsub.png">
 
-## AWS S3:
+En este caso nuestro device sera el publisher, como se puede ver en el codigo principal.
 
-## AWS CloudFront:
+    client.publish(AWS_IOT_TOPIC, string2char(output1));
+
+Para poder establecer la conexion correctamente con AWS se utiliza un sistema de 2 certificados y una private Key que identifican al device ante AWS cuando mandamos mensajes a un Endpoint en HTTPS.
+
+<img src="./Images/mqtts.png">
+
+#### Create a Thing:
+
+Los pasos para poder crear una thing son actualmente muy sencillos, primero deberemos entrar al servicio AWS IoT Core desde AWS Management Console.
+
+<img src="./Images/iot1.png">
+
+Ahora crearemos nuestra thing, si es la primera vez que creas una no deberian aparecer things como se muestra en pantalla.
+
+<img src="./Images/iot2.png">
+
+Con AWS es posible crear toda una brigada de devices a la vez, sin embargo para este proyecto solo necesitaremos crear una.
+
+<img src="./Images/iot3.png">
+
+Como podemos ver en el siguiente menu, veremos que podemos configurar muchas caracteristicas de las things con el fin de poder crear categorias, permidos dintitos entre things, etc. Sin embargo solo le pondremos el nombre a nuestra thing y presionaremos next al fondo de la pantalla.
+
+<img src="./Images/iot4.png">
+
+Recomiendo ampliamente que dejen a AWS crear los certificarlos y gestionarlos, asi que dejamos la configuracion que nos ofrece AWS como recommended y presionamos Next.
+
+<img src="./Images/iot5.png">
+
+Para que nuestro device pueda mandar datos correctamente a AWS deberemos agregar una policy la cual permita esto correctamente.
+
+<img src="./Images/iot6.png">
+
+La policy que debemos implementar para este prototipo sin ninguna complicacion va a ser la siguiente.
+
+<img src="./Images/iot7.png">
+
+Al momento de crear la Thing AWS nos dara todos los certificados necesarios, descargalos todos.
+
+<img src="./Images/iot8.png">
+
+Con esto el unico dato que nos faltaria para configurar nuestro device seria el Endpoint de AWS, sin embargo ese se encuentra en la seccion de Settings.
+
+<img src="./Images/iot9.png">
+
+### AWS DynamoDB:
+
+
+
+### AWS IoT Rule:
+
+## WebPage Services:
+
+### AWS Lambda:
+
+### AWS API Gateway:
+
+#### Postman Test:
+
+#### CORS:
+
+### AWS S3:
+
+### AWS CloudFront:
 
 # Final Product:
 
