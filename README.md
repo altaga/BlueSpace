@@ -29,6 +29,8 @@
     - [AWS S3:](#aws-s3)
     - [AWS CloudFront:](#aws-cloudfront)
 - [Final Product:](#final-product)
+  - [Device:](#device)
+  - [WebPage:](#webpage)
 - [Field Test:](#field-test)
 - [EPIC DEMO:](#epic-demo)
 
@@ -279,13 +281,13 @@ NOTA: Al momento de agregar la integracion de Lambda a nuestra API Gateway, se c
 
 #### Postman Test:
 
-Para probar que esta funcionando nuestra API, usaremos algun software para hacer request como lo es en este caso Postman, como podemos ver si ponemos dos fechas en la API nos regresara nuestro escaneo como muestra la imagen.
+Para probar que esta funcionando nuestra API, usaremos algun software para probar el request como Postman. Si ponemos dos fechas en la API nos regresara nuestro escaneo como muestra la imagen.
 
 <img src="./Images/api5.png">
 
 #### CORS:
 
-Ahora si queremos consumir en nuestra pagina web la API deberemos configurar el Cross-Origin Resource Sharing como se muestra en a imagen.
+Ahora si queremos consumir en nuestra pagina web la API deberemos configurar el Cross-Origin Resource Sharing como se muestra en a imagen, la parte importante de esta configuracion es permitir nuestras paginas web como Origin autorizado.
 
 <img src="./Images/api6.png">
 
@@ -293,12 +295,47 @@ NOTA: sin esto no podremos consumir la API desde la pagina web.
 
 ### AWS S3:
 
+Para poder desplegar la web app a todo internet, deberemos crear un bucket S3, el cual se encargara de almacenar los achivos de la pagina web y realizar el static web site hosting.
 
+<img src="./Images/s3-1.png">
+
+Al ser una aplicacion echa con el framework de ReactJS, unicamente es necesario colocar los archivos dentro de el bucket arrastrandolos.
+
+<img src="./Images/s3-2.png">
+
+En la seccion de propiedades podremos activar el static website hosting, esto nos entregara un URL el cual podremos acceder desde cualquier parte del mundo, sin embargo para el despliegue de una aplicacion a produccion, solo esto NO es suficiente.
 
 ### AWS CloudFront:
 
+Con este servicio podremos asegurar que nuestra pagina obtenga un certificado SSL y darnos los beneficios del [CDN](https://aws.amazon.com/cloudfront/?nc1=h_ls).
+
+<img src="./Images/cdn.png">
+
+Ya que este servicio funciona sin problema, podremos ver nuestra pagina web corriendo, con acceso a la api que creamos y con su certificado SSL.
+
+<img src="./Images/cdn1.png">
+
+Sientete libre de entrar a la pagina y explorar mi historico de exposicion a personas en mi dia a dia.
+
+WebPage: https://d628z7yj7y4ti.cloudfront.net/
+
 # Final Product:
+
+## Device:
+<img src="./Images/product1.jpg">
+<img src="./Images/product2.jpg">
+
+## WebPage:
+
+<img src="./Images/cdn1.png" width="600px">
+<img src="./Images/cdn2.png" width="200px">
 
 # Field Test:
 
+Para probar que el dispositivo funcionaba en un ambiente real, realice una prueba de campo con el device en mi visita semanal al supermercado.
+
+[![FIELD](./Images/logo.png)](https://youtu.be/wViDAwuF3z8)
+
 # EPIC DEMO:
+
+[![DEMO](./Images/logo.png)](Pendiente)
