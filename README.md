@@ -334,7 +334,7 @@ WebPage: https://d628z7yj7y4ti.cloudfront.net/
 
 Para probar que el dispositivo funcionaba en un ambiente real, realice una prueba de campo con el device en mi visita semanal al supermercado.
 
-[![FIELD](./Images/logo.png)](https://youtu.be/wViDAwuF3z8)
+[![FIELD](./Images/logo.png)](https://youtu.be/w0Fv6816_4M)
 
 # EPIC DEMO:
 
