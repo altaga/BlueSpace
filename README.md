@@ -338,4 +338,4 @@ Para probar que el dispositivo funcionaba en un ambiente real, realice una prueb
 
 # EPIC DEMO:
 
-[![DEMO](./Images/logo.png)](Pendiente)
+[![DEMO](./Images/logo.png)](https://youtu.be/gp_sZPsd5kc)
