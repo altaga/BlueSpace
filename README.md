@@ -38,7 +38,6 @@
 
  Maintain the recommended distance of 1 - 2 meters by means of a simple and fast implementation system without having high infrastructure costs.
 
-# Solution:
 
 I build a BT and BLE signal monitoring system that can detect the distance between one person and another by doing an analysis of the signal strength. In addition to being able to give the user a risk score on the exposure they have had to several people.
 
@@ -59,6 +58,8 @@ Our solution has the advantage of not needing to carry out complex video analyti
 https://www.unacast.com/covid19/social-distancing-scoreboard
 
 The Disadvantage of those ideas is that they perform an extrapolation of the social distance by country, instead of making a solution based on real data. Which our solution can generate.
+
+# Solution
 
 Our solution has the advantage of not needing to carry out complex video analytics to give distance results. The advantage of using these simple systems is that they are easily achievable at a large-scale manufacturing level and can prevent the spread of new COVID-19 patients, in addition to generating an enormous amount of information and data on the social distancing of people in real time, added to this we can generate heat maps where we can see crowds and more risk of contagion.
 
