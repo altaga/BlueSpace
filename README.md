@@ -36,10 +36,8 @@
 
 # Introduction:
 
- Maintain the recommended distance of 1 - 2 meters by means of a simple and fast implementation system without having high infrastructure costs.
 
-
-I build a BT and BLE signal monitoring system that can detect the distance between one person and another by doing an analysis of the signal strength. In addition to being able to give the user a risk score on the exposure they have had to several people.
+I built a BT and BLE signal monitoring system that can detect the distance between one person and another by doing an analysis of the signal strength. In addition to being able to give the user a risk score on the exposure they have had to several people.
 
 In addition to giving a daily exposure analysis through a website.
 
