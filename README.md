@@ -42,7 +42,7 @@
 
 I build a BT and BLE signal monitoring system that can detect the distance between one person and another by doing an analysis of the signal strength. In addition to being able to give the user a risk score on the exposure they have had to several people.
 
-Ademas de dar un analisis de exposicion diario mediante una pagina web.
+In addition to giving a daily exposure analysis through a website.
 
 WebPage: https://d628z7yj7y4ti.cloudfront.net/
 
@@ -88,33 +88,33 @@ Our solution has the advantage of not needing to carry out complex video analyti
 
 # M5 Core2 AWS Setup:
 
-El M5Core2 por fortuna para mi tiene muchos frameworks para poder programarlos, sin embargo ya que mi mayor conocimiento y code snippets los he realizado en el Arduino IDE, apoveche el soporte de Arduino del dispositivo para desarrollar mas eficientemente la solucion.
+Fortunately, the M5Core2 has many frameworks to be able to program them, however since my greater knowledge and code snippets have been done in the Arduino IDE. I took advantage of the Arduino support of the device to develop the solution more efficiently.
 
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Arudino_Logo.svg/1200px-Arudino_Logo.svg.png">
 
-Instala el soporte de las placas ESP32 y la libreria M5Core2 para empezar a trabajar con el Arduino IDE.
+Install the ESP32 board support and the M5Core2 library to start working with the Arduino IDE.
 
 1. Arduino IDE - [Program Link](https://www.arduino.cc/en/software)
 2. Arduino M5Core2 Library - [Library Link](https://github.com/m5stack/M5Core2)
 
-Aunque el Arduino IDE viene ya con varios ejemplos para utilizar la placa, dejo varios codigos optimizados y mejorados para que te acostumbres a programar en esta placa.
+Although the Arduino IDE already comes with several examples to use the board, I leave several optimized and improved codes for you to get used to programming on this board.
 
 [Test Sketches](https://github.com/altaga/BlueSpace/tree/main/Arduino%20Test%20Sketch)
 
 Video:
 [![DEMO](./Images/logo.png)](https://youtu.be/wViDAwuF3z8)
 
-Advertencia: El compilado de el codigo en Arduino puede tardar hasta 5 min, no desesperes si la primera compilacion es tardada.
+Warning: The compilation of the code in Arduino can take up to 5 min, do not despair if the first compilation is taking long haha.
 
 ## Main Code:
 
-El codigo principal de BlueSpace realiza lo siguiente:
+The BlueSpace core code does the following:
 
 <img src="./Images/softDiagram.png">
 
-El utilizar un formato JSON tiene dos motivos principales:
+There are two main reasons for using a JSON format:
 
-1. Al realizar el escaneo de dispositivos de BT, es normal obtener dos o mas detecciones del mismo dispositivo, al guardarlo en JSON nos permite usar la Address como una Key, la cual eliminara las refrencias multiples.
+1. When scanning BT devices, it is normal to obtain two or more detections of the same device, when saving it in JSON it allows us to use the Address as a Key, which will eliminate multiple references.
 
         class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
             void onResult(BLEAdvertisedDevice advertisedDevice) {
@@ -128,119 +128,118 @@ El utilizar un formato JSON tiene dos motivos principales:
             }
         };
 
-2. En el Backend y en Frontend de la aplicacion el formato json permite una manipulacion y organizacion de datos mas sencilla.
+2. In the Backend and Frontend of the application, the json format allows easier manipulation and organization of data.
 
-// Realizar video en la barranca de BT para mostrar mejor el funcionamiento.
 
-Para configurar las credenciales del archivo [certs.h](https://github.com/altaga/BlueSpace/blob/main/Arduino%20Code/BlueSpace/certs.h) favor de ir a la seccion [AWS IoT Thing Creation](#create-a-thing)
+To configure the credentials of the [certs.h](https://github.com/altaga/BlueSpace/blob/main/Arduino%20Code/BlueSpace/certs.h) file, please go to this section [AWS IoT Thing Creation](#create-a-thing)
 
 # AWS Services:
 
-Todos los servicios de Cloud usados fueron exclusivamente de AWS para el desarrollo de la app, no necesitas experiencia previa para este tutorial, sin embargo recomendamos leer toda la documentacion de los servicios que vamos a utilizar para evitar que te confundas con algun termino.
+All the Cloud services used were exclusively from AWS for the development of the app, you do not need previous experience for this tutorial, however we recommend reading all the documentation of the services that we are going to use to avoid being confused with any term.
 
 [AWS All Link](#cloud-services)
 
-Los servicios utilizados los dividi en dos grandes ramas, los servicios que utiliza el device principalmente y los servicios que utiliza la WebApp para consumir AWS.
+The services used are divided into two large branches, the services that the device uses mainly and the services that the WebApp uses to consume AWS.
 
 ## Device Services:
 
 ### AWS IoT:
 
-Este servicio es principalmente destinado a poder comunicar a nuestro device de forma segura con AWS, esto se realiza mediante MQTTS, osea un servicio de suscripbion y publicacion de datos a traves de topicos.
+This service is mainly intended to be able to communicate to our device in a secure way with AWS, this is done through MQTTS, that is, a subscription service and publication of data through topics.
 
 <img src="https://www.luisllamas.es/wp-content/uploads/2019/02/protocolos-iot-pubsub.png">
 
-En este caso nuestro device sera el publisher, como se puede ver en el codigo principal.
+In this case, our device will be the publisher, as you can see in the main code.
 
     client.publish(AWS_IOT_TOPIC, string2char(output1));
 
-Para poder establecer la conexion correctamente con AWS se utiliza un sistema de 2 certificados y una private Key que identifican al device ante AWS cuando mandamos mensajes a un Endpoint en HTTPS.
+In order to establish the connection correctly with AWS, a system of 2 certificates and a private Key are used that identify the device to AWS when we send messages to an Endpoint in HTTPS.
 
 <img src="./Images/mqtts.png">
 
 #### Create a Thing:
 
-Los pasos para poder crear una thing son actualmente muy sencillos, primero deberemos entrar al servicio AWS IoT Core desde AWS Management Console.
+The steps to create a thing are currently very simple, first we must enter the AWS IoT Core service from the AWS Management Console.
 
 <img src="./Images/iot1.png">
 
-Ahora crearemos nuestra thing, si es la primera vez que creas una no deberian aparecer things como se muestra en pantalla.
+Now we will create our thing, if it is the first time you create one, things should not appear as shown on the screen.
 
 <img src="./Images/iot2.png">
 
-Con AWS es posible crear toda una brigada de devices a la vez, sin embargo para este proyecto solo necesitaremos crear una.
+With AWS it is possible to create a whole brigade of devices at the same time, however for this project we will only need to create one.
 
 <img src="./Images/iot3.png">
 
-Como podemos ver en el siguiente menu, veremos que podemos configurar muchas caracteristicas de las things con el fin de poder crear categorias, permidos dintitos entre things, etc. Sin embargo solo le pondremos el nombre a nuestra thing y presionaremos next al fondo de la pantalla.
+As we can see in the following menu, we will see that we can configure many characteristics of things in order to be able to create categories, allowed digits between things, etc. However, we will only name our thing and press next at the bottom of the screen.
 
 <img src="./Images/iot4.png">
 
-Recomiendo ampliamente que dejen a AWS crear los certificarlos y gestionarlos, asi que dejamos la configuracion que nos ofrece AWS como recommended y presionamos Next.
+I highly recommend that you let AWS create the certify and manage them, so we leave the configuration that AWS offers us as recommended and click Next.
 
 <img src="./Images/iot5.png">
 
-Para que nuestro device pueda mandar datos correctamente a AWS deberemos agregar una policy la cual permita esto correctamente.
+So that our device can send data correctly to AWS we must add a policy which allows this correctly.
 
 <img src="./Images/iot6.png">
 
-La policy que debemos implementar para este prototipo sin ninguna complicacion va a ser la siguiente.
+The policy that we must implement for this prototype without any complications is going to be the following.
 
 <img src="./Images/iot7.png">
 
-Al momento de crear la Thing AWS nos dara todos los certificados necesarios, descargalos todos.
+When creating the Thing AWS will give us all the necessary certificates, download them all.
 
 <img src="./Images/iot8.png">
 
-Con esto el unico dato que nos faltaria para configurar nuestro device seria el Endpoint de AWS, sin embargo ese se encuentra en la seccion de Settings.
+With this, the only data that we would need to configure our device would be the AWS Endpoint, however that is in the Settings section.
 
 <img src="./Images/iot9.png">
 
-Asi deberas ver los datos llegar a tu monitor en AWS.
+So you should see the data arrive on your monitor in AWS.
 
 <img src="./Images/mqtt.gif">
 
 ### AWS DynamoDB:
 
-Ya que podemos mandar datos a AWS, no podemos dejar que se desperdicien, los datos debemos analizarlos para poder hacer un exposure tracing posteriormente en nuestra app, asi que como primer paso iremos ahora al servicio de DynamoDB y crearemos una DB con las siguientes caracteristicas.
+Since we can send data to AWS, we cannot let it go to waste, we must analyze the data to be able to do an exposure tracing later in our app. So, as a first step we will now go to the DynamoDB service and create a DB with the following characteristics.
 
 <img src="./Images/db1.png">
 
-Nada mas tenemos que recordar el nombre de la DB para el siguiente paso.
+We just have to remember the name of the DB for the next step.
 
 <img src="./Images/db2.png">
 
 ### AWS IoT Rule:
 
-La forma mas sencilla de poder almacenar los datos recibimos en la cloud de forma automatica, ser a travez de una IoT Rule, esta rule es una proceso que se ejecutara cada vez que recibamos un mensaje en nuestro Topic, como una funcion serverless. Para crear la rule deberemos ir la seccion de rules de AWS IoT.
+The simplest way to store the data we receive in the cloud automatically, is through an IoT Rule, this rule is a process that will be executed every time we receive a message in our Topic, as a serverless function. To create the rule we must go to the AWS IoT rules section.
 
 <img src="./Images/rule1.png">
 
-Crearemos nuestra rule solo colocando el name que queramos y poniendo en la seccion de Rule query statement lo siguiente.
+We will create our rule only by placing the name we want and putting the following in the Rule query statement section.
 
 <img src="./Images/rule2.png">
 
-La rule requiere que configuremos una accion que ocurrira cada entrada de datos, para este caso sera la siguiente.
+The rule requires that we configure an action that will occur each data entry, in this case it will be the following.
 
 <img src="./Images/rule3.png">
 
-Dentro de esta action la configuracion requerida sera la siguiente.
+Within this action the required configuration will be the following.
 
 <img src="./Images/rule4.png">
 
-Una vez terminemos esta configuracion, tendremos la accion de subir datos a la DB de forma automatica.
+Once we finish this configuration, we will have the action of uploading data to the DB automatically.
 
 <img src="./Images/rule5.png">
 
 ## WebPage Services:
 
-Ya que tenemos todos los servicios del device corriendo y mandando datos a nuestra DB, ahora debemos consumirlos en nuestra App para mostrar datos relevantes.
+Since we have all the services of the device running and sending data to our DB, now we must consume them in our App to show relevant data.
 
 ### AWS Lambda:
 
-Como dice el [Connection Diagram](#connection-diagram) el primer paso para consumir la DB sera crear una lambda que realice una lectura de los datos, ademas ya que nuestra app debe de poder realizar lecturas por fecha, deberemos programar correctamente un scan de la DB.
+As the [Connection Diagram](#connection-diagram) says, the first step to consume the DB will be to create a lambda that performs a reading of the data, in addition, since our app must be able to perform readings by date, we must correctly program a scan of the DB.
 
-En mi caso mi solucion fue utilizar python como Backend de la funcion lambda.
+In my case my solution was to use python as the Backend of the lambda function.
 
     import json
     import boto3
@@ -257,65 +256,65 @@ En mi caso mi solucion fue utilizar python como Backend de la funcion lambda.
         except:
             return("Error")
 
-Notaremos que el codigo contiene la refrencia de event["headers]["ANY_LABEL"], esto hara que API Gateway pueda mandar las variables en los headers.
+We will notice that the code contains the reference of event ["headers]["ANY_LABEL"], this will make that API Gateway can send the variables in the headers.
 
 ### AWS API Gateway:
 
-Para poder consumir desde nuestra pagina web la funcion lambda, deberemos crear una API que podamos llamar desde la app.
+In order to consume the lambda function from our website, we must create an API that we can call from the app.
 
 <img src="./Images/api1.png">
 
-Ponemos el nombre que querramos a nuestra API y le damos next hasta que se cree.
+We put the name we want to our API and we give it next until it is created.
 
 <img src="./Images/api2.png">
 
-Una vez teniendo nuestra API, tendremos que crear una route, la cual va a ser el "path" al cual haras la llamada.
+Once we have our API, we will have to create a route, which will be the "path" to which you will make the call.
 
 <img src="./Images/api3.png">
 
-La integracion de Lambda en la API sera la siguiente.
+The integration of Lambda in the API will be the following.
 
 <img src="./Images/api4.png">
 
-NOTA: Al momento de agregar la integracion de Lambda a nuestra API Gateway, se configurara automaticamente los permisos.
+NOTE: When adding the Lambda integration to our API Gateway, the permissions will be automatically configured.
 
 #### Postman Test:
 
-Para probar que esta funcionando nuestra API, usaremos algun software para probar el request como Postman. Si ponemos dos fechas en la API nos regresara nuestro escaneo como muestra la imagen.
+To test that our API is working, we will use some software to test the request like Postman. If we put two dates in the API, our scan will return as the image shows.
 
 <img src="./Images/api5.png">
 
 #### CORS:
 
-Ahora si queremos consumir en nuestra pagina web la API deberemos configurar el Cross-Origin Resource Sharing como se muestra en a imagen, la parte importante de esta configuracion es permitir nuestras paginas web como Origin autorizado.
+Now if we want to consume the API in our web page we will have to configure the Cross-Origin Resource Sharing as shown in the image, the important part of this configuration is to allow our web pages as Authorized Origin.
 
 <img src="./Images/api6.png">
 
-NOTA: sin esto no podremos consumir la API desde la pagina web.
+NOTE: without this we will not be able to consume the API from the web page.
 
 ### AWS S3:
 
-Para poder desplegar la web app a todo internet, deberemos crear un bucket S3, el cual se encargara de almacenar los achivos de la pagina web y realizar el static web site hosting.
+In order to deploy the web app to the entire internet, we must create an S3 bucket, which will be in charge of storing the files of the web page and performing the static web site hosting.
 
 <img src="./Images/s3-1.png">
 
-Al ser una aplicacion echa con el framework de ReactJS, unicamente es necesario colocar los archivos dentro de el bucket arrastrandolos.
+Being an application made with the ReactJS framework, it is only necessary to place the files inside the bucket by dragging them.
 
 <img src="./Images/s3-2.png">
 
-En la seccion de propiedades podremos activar el static website hosting, esto nos entregara un URL el cual podremos acceder desde cualquier parte del mundo, sin embargo para el despliegue de una aplicacion a produccion, solo esto NO es suficiente.
+In the properties section we can activate the static website hosting, this will give us a URL which we can access from anywhere in the world, however for the deployment of an application to production, this alone is NOT enough.
 
 ### AWS CloudFront:
 
-Con este servicio podremos asegurar que nuestra pagina obtenga un certificado SSL y darnos los beneficios del [CDN](https://aws.amazon.com/cloudfront/?nc1=h_ls).
+With this service we can ensure that our page obtains an SSL certificate and give us the benefits of the [CDN](https://aws.amazon.com/cloudfront/?nc1=h_ls).
 
 <img src="./Images/cdn.png">
 
-Ya que este servicio funciona sin problema, podremos ver nuestra pagina web corriendo, con acceso a la api que creamos y con su certificado SSL.
+Since this service works without problem, we will be able to see our web page running, with access to the api that we created and with its SSL certificate.
 
 <img src="./Images/cdn1.png">
 
-Sientete libre de entrar a la pagina y explorar mi historico de exposicion a personas en mi dia a dia.
+Feel free to enter the page and explore my history of exposure to people in my day to day.
 
 WebPage: https://d628z7yj7y4ti.cloudfront.net/
 
@@ -332,10 +331,10 @@ WebPage: https://d628z7yj7y4ti.cloudfront.net/
 
 # Field Test:
 
-Para probar que el dispositivo funcionaba en un ambiente real, realice una prueba de campo con el device en mi visita semanal al supermercado.
+To test that the device worked in a real environment, I did a field test with the device on my weekly visit to the supermarket. 
 
 [![FIELD](./Images/logo.png)](https://youtu.be/Wrq1BNmZRns)
 
-# EPIC DEMO:
+# DEMO:
 
 [![DEMO](./Images/logo.png)](https://youtu.be/gp_sZPsd5kc)
